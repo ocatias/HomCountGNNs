@@ -6,7 +6,7 @@ command:
 - ${program}
 - ${args}
 metric:
-  name: Final/Test/rocauc (ogb)
+  name: Final/Val/rocauc (ogb)
   goal: maximize
 parameters:
   model: 
