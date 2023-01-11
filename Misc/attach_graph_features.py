@@ -22,7 +22,6 @@ class AttachGraphFeat(BaseTransform):
         self.graph_features = graph_features
 
         # Compute mean and standard deviation of training data for standardization
-        print(list(map(lambda f: f['counts'] ,(filter(lambda f: f['split'] == 'train', graph_features)))))
         training_counts = torch.stack(list(map(lambda f: torch.tensor(f['counts']) ,(filter(lambda f: f['split'] == 'train', graph_features)))))
         self.mean  = torch.mean(training_counts)
         self.std = torch.std(training_counts)

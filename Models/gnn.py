@@ -77,10 +77,23 @@ class GNN(torch.nn.Module):
         for param in self.gnn_node.parameters():
             param.requires_grad = False
 
-    def set_mlp(self, graph_features = 0):
+    def set_mlp(self, graph_features = 0, copy_emb_weights = False):
         # Create a new MLP, this is meant to be used if the number of graph level features changes
-        self.graph_pred_linear = torch.nn.Linear(self.emb_dim + graph_features, self.num_classes*self.num_tasks)
+        new_linear_layer = torch.nn.Linear(self.emb_dim + graph_features, self.num_classes*self.num_tasks)
+
+        if copy_emb_weights:
+            new_linear_layer.weight.requires_grad = False
+            new_linear_layer.weight[:, 0:self.emb_dim] = self.graph_pred_linear.weight[:, 0:self.emb_dim].detach().clone()
+            new_linear_layer.weight.requires_grad = True
+
+            new_linear_layer.bias.requires_grad = False
+            new_linear_layer.bias = torch.nn.Parameter(self.graph_pred_linear.bias.detach().clone())
+            new_linear_layer.bias.requires_grad = True
+
+        self.graph_pred_linear = new_linear_layer
         self.graph_features = graph_features
+
+
 
 
 

@@ -5,7 +5,7 @@ import os
 import wandb
 import torch
 import numpy as np
-from datetime import datetime
+from datetime import datetime, date
 
 from Exp.parser import parse_args
 import Misc.config as config
@@ -20,7 +20,7 @@ def main(args):
     random.seed(args.seed)
 
     now = datetime.now()
-    model_path = os.path.join(config.RESULTS_PATH, "Models", f"{args.dataset}_{now.strftime('%H:%M:%S')}")
+    model_path = os.path.join(config.RESULTS_PATH, "Models", f"{args.dataset}_{date.today()}_{now.strftime('%H:%M:%S')}")
 
     print(args)
     train_loader, val_loader, test_loader = load_dataset(args, config)
@@ -111,7 +111,9 @@ def main(args):
                     f"Val/{eval_name}": val_result[eval_name],
                     "Test/Loss": test_result["total_loss"],
                     f"Test/{eval_name}": test_result[eval_name],
-                    "LearningRate": optimizer.param_groups[0]['lr']})
+                    "LearningRate": optimizer.param_groups[0]['lr'],
+                    "GraphFeatures": graph_feat
+                    })
 
             step_scheduler(scheduler, args, val_result["total_loss"])
 
@@ -136,6 +138,11 @@ def main(args):
 
         loss_train, loss_val, loss_test = train_results['total_loss'][best_val_epoch], val_results['total_loss'][best_val_epoch], test_result['total_loss'][best_val_epoch]
         result_val, result_test = val_results[eval_name][best_val_epoch], test_result[eval_name][best_val_epoch]
+        wandb.log({
+            f"Final/Val(graph_feat)/{eval_name}": result_val,
+            f"Final/Test(graph_feat)/{eval_name}": result_test,
+            f"graph_features": graph_feat})
+
 
         print("\n\nFINAL RESULT")
         runtime = (time.time()-time_start)/3600
@@ -144,19 +151,6 @@ def main(args):
         print(f"\tTRAIN \tLoss: {loss_train:10.4f}")
         print(f"\tVAL \tLoss: {loss_val:10.4f}\t{eval_name}: {result_val:10.4f}")
         print(f"\tTEST \tLoss: {loss_test:10.4f}\t{eval_name}: {result_test:10.4f}")
-
-        # if args.use_tracking:
-            # print("logging")
-            # wandb.log({
-            #     "Final/Train/Loss": loss_train,
-            #     # f"Final/Train/{eval_name}": train_results[eval_name][best_val_epoch],
-            #     "Final/Val/Loss": loss_val,
-            #     f"Final/Val/{eval_name}": result_val,
-            #     "Final/Test/Loss": loss_test,
-            #     f"Final/Test/{eval_name}": result_test})
-
-            # wandb.finish()
-            # print("end logging")
 
         results.append({
             "graph_features": graph_feat,
@@ -185,13 +179,29 @@ def main(args):
         if args.do_freeze_gnn:
             model.freeze_gnn(True)
 
-        model.set_mlp(graph_feat + 1)
+        model.set_mlp(graph_feat + 1, copy_emb_weights = True)
         print(f"\n\n\nRetraining. Frozen: {args.do_freeze_gnn}, Graph features: {graph_feat + 1}")
         finetune = True
 
-    print("Graph features\tVal Result\Test Result")
+    print("\nGraph features\tVal Result\tTest Result")
     for result in results:
         print(f"{result['graph_features']}: {result['final_val_results']}\t{result['final_test_result']}")
+
+    val_metrics = list(map(lambda r: r["final_val_results"], results))
+    test_metrics = list(map(lambda r: r["final_test_result"], results))
+    best_val_metric = min(val_metrics) if mode == "min" else max(val_metrics)
+    best_test_metric = min(test_metrics) if mode == "min" else max(test_metrics)
+
+    print(f"\nBest validation: {best_val_metric}\nBest test: {best_test_metric}")
+
+    if args.use_tracking:
+        print("logging: ", end="")
+        wandb.log({
+            f"Final/Val/{eval_name}": best_val_metric,
+            f"Final/Test/{eval_name}": best_test_metric})
+        wandb.finish()
+        print("Done.")
+
     return results        
 
 def run(passed_args = None):
