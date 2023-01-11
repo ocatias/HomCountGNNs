@@ -1,0 +1,35 @@
+program: Exp/run_model.py
+method: bayes
+command:
+- ${env}
+- /home/fjogl/miniconda3/envs/hom/bin/python
+- ${program}
+- ${args}
+metric:
+  name: Final/Val/rocauc (ogb)
+  goal: maximize
+parameters:
+  model: 
+    values: ["GIN"]
+  batch_size: 
+    values: [32]
+  emb_dim: 
+    values:  [64, 256]
+  drop_out: 
+    values:  [0, 0.5]
+  num_layer: 
+    values:  [1, 2, 3, 4, 5]
+  pooling: 
+    values:  ["sum", "mean"]
+  lr: 
+    values: [0.001, 0.0001]
+  lr2: 
+    values: [0.001,0.0001, 0.0005]
+  freeze_gnn:
+    values: [0, 1]
+  nr_graph_feat:
+    values: [50]
+  graph_feat:
+    values: ["Counts/OGBG-MOLLIPO_random_ktree_max_50_il1(1).homson"]
+  dataset:
+    values: ["ogbg-mollipo"]
