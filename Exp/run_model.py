@@ -57,7 +57,7 @@ def main(args):
     
 
     finetune = False
-    for graph_feat in range(args.nr_graph_feat):
+    for graph_feat in range(args.nr_graph_feat, 5):
         optimizer, scheduler = get_optimizer_scheduler(model, args, finetune = finetune)
         loss_dict = get_loss(args)
 
