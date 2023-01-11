@@ -1,7 +1,6 @@
 datasets/
 wandb/
 Results/
-Counts/
 
 
 # Byte-compiled / optimized / DLL files
