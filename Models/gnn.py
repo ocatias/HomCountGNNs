@@ -83,38 +83,35 @@ class GNN(torch.nn.Module):
 
     def set_mlp(self, graph_features = 0, copy_emb_weights = False):
         self.graph_features = graph_features
+        hidden_size = self.emb_dim // 2
+        new_mlp = ModuleList([])
+        new_mlp.requires_grad = False
 
-        if self.num_mlp_layers == 1:
+        
+        for i in range(self.num_mlp_layers):
+            in_size = hidden_size if i > 0 else self.emb_dim + graph_features
+            out_size = hidden_size if i < self.num_mlp_layers - 1 else self.num_classes*self.num_tasks
 
-            # Create a new MLP, this is meant to be used if the number of graph level features changes
-            new_linear_layer = Linear(self.emb_dim + graph_features, self.num_classes*self.num_tasks)
+            new_linear_layer = Linear(in_size, out_size)
 
             if copy_emb_weights:
+                copy_len = self.emb_dim if i == 0 else hidden_size
+
                 new_linear_layer.weight.requires_grad = False
-                new_linear_layer.weight[:, 0:self.emb_dim] = self.mlp[0].weight[:, 0:self.emb_dim].detach().clone()
+                new_linear_layer.weight[:, 0:copy_len] = self.mlp[2*i].weight[:, 0:copy_len].detach().clone()
                 new_linear_layer.weight.requires_grad = True
 
                 new_linear_layer.bias.requires_grad = False
-                new_linear_layer.bias = Parameter(self.mlp[0].bias.detach().clone())
+                new_linear_layer.bias = Parameter(self.mlp[2*i].bias.detach().clone())
                 new_linear_layer.bias.requires_grad = True
 
-            self.mlp = ModuleList([new_linear_layer])
-        else:
-            hidden_size = self.emb_dim // 2
-            self.mlp = ModuleList([Linear(self.emb_dim + graph_features, hidden_size), ReLU()])
-            for _ in range(self.num_mlp_layers-2):
-                self.mlp.append(Linear(hidden_size, hidden_size))
-                self.mlp.append(ReLU())
+            new_mlp.append(new_linear_layer)
 
-            self.mlp.append(Linear(hidden_size, self.num_classes*self.num_tasks))
+            if self.num_mlp_layers > 0 and i < self.num_mlp_layers - 1:
+                new_mlp.append(ReLU())
 
-
-        
-
-
-
-
-
+        new_mlp.requires_grad = True
+        self.mlp = new_mlp
 
 if __name__ == '__main__':
     GNN(num_tasks = 10)
