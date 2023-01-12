@@ -32,7 +32,7 @@ parameters:
   nr_graph_feat:
     values: [50]
   graph_feat:
-    values: ["Counts/OGBG-MOLBACE_random_ktree_max_50_il1.homson"]
+    values: ["Counts/old/OGBG-MOLBACE_random_ktree_max_50_il1.homson"]
   dataset:
     values: ["ogbg-molbace"]
   lr_schedule_patience:
