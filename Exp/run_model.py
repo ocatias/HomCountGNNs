@@ -189,20 +189,25 @@ def main(args):
 
     val_metrics = list(map(lambda r: r["final_val_results"], results))
     test_metrics = list(map(lambda r: r["final_test_result"], results))
-    best_val_metric = min(val_metrics) if mode == "min" else max(val_metrics)
-    best_test_metric = min(test_metrics) if mode == "min" else max(test_metrics)
+    graph_features = list(map(lambda r: r["graph_features"], results))
 
-    print(f"\nBest validation: {best_val_metric}\nBest test: {best_test_metric}")
+    best_val_idx = np.argmin(val_metrics) if mode == "min" else np.argmax(val_metrics)
+    best_val_metric = val_metrics[best_val_idx]
+    best_test_metric = test_metrics[best_val_idx]
+    best_graph_feat = graph_features[best_val_idx]
+
+    print(f"\nBest validation: {best_val_metric}\nBest test: {best_test_metric}\nGraph feat: {best_graph_feat}\n")
 
     if args.use_tracking:
         print("logging: ", end="")
         wandb.log({
-            f"Final/Val/{eval_name}": best_val_metric,
-            f"Final/Test/{eval_name}": best_test_metric})
+            f"Best/Val-{eval_name}": best_val_metric,
+            f"Best/Test-{eval_name}": best_test_metric,
+            f"Best/Graph_feat": best_graph_feat})
         wandb.finish()
         print("Done.")
 
-    return results        
+    return {"results": results, "val": best_val_metric, "test": best_test_metric, "graph_feat": best_graph_feat}        
 
 def run(passed_args = None):
     args = parse_args(passed_args)
