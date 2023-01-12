@@ -6,8 +6,8 @@ command:
 - ${program}
 - ${args}
 metric:
-  name: Best/Val-rmse (ogb)
-  goal: minimize
+  name: Best/Val-rocauc (ogb)
+  goal: maximize
 parameters:
   model: 
     values: ["GIN"]
