@@ -186,14 +186,14 @@ def main():
                         mode = dict["mode"]
 
                     if best_result_val is None or \
-                            (mode == "min" and min(dict["result_val"]) < best_result_val) or \
-                            (mode == "max" and max(dict["result_val"]) > best_result_val):
+                            (mode == "min" and min(dict["val"]) < best_result_val) or \
+                            (mode == "max" and max(dict["val"]) > best_result_val):
                         best_params = dict["params"]
                         
                         if mode == "min":
-                            best_result_val = min(dict["result_val"])
+                            best_result_val = min(dict["val"])
                         else:
-                            best_result_val = max(dict["result_val"])
+                            best_result_val = max(dict["val"])
 
             print(f"Best params have score {best_result_val:.4f} and are:\n{best_params}")
 
