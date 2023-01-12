@@ -13,6 +13,9 @@ class AttachGraphFeat(BaseTransform):
         with open(path_graph_feat, 'r') as file:
             graph_features = json.load(file)
 
+            if type(graph_features) is dict:
+                graph_features = graph_features["data"]
+
         for i, g in enumerate(graph_features):
             g['idx'] = i
 
