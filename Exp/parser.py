@@ -93,6 +93,9 @@ def parse_args(passed_args=None):
                         help="Freeze GNN layers after training it.")
     parser.add_argument('--nr_graph_feat', type=int, default=0,
                         help='Number of graph features to use')
+    
+    parser.add_argument('--drop_feat', type=int, default=0,
+                        help="Drop all features from the graph")
                     
 
     # Load partial args instead of command line args (if they are given)
@@ -111,6 +114,7 @@ def parse_args(passed_args=None):
     args.__dict__["use_virtual_node"] = args.virtual_node == 1
     args.__dict__["use_node_encoder"] = args.node_encoder == 1
     args.__dict__["do_freeze_gnn"] = args.freeze_gnn == 1
+    args.__dict__["do_drop_feat"] = args.drop_feat == 1
 
     # https://codereview.stackexchange.com/a/79015
     # If a config file is provided, write it's values into the arguments
