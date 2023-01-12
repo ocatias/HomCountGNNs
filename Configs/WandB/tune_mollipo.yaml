@@ -6,7 +6,7 @@ command:
 - ${program}
 - ${args}
 metric:
-  name: Final/Val/rocauc (ogb)
+  name: Best/Val-rocauc (ogb)
   goal: maximize
 parameters:
   model: 
@@ -17,7 +17,9 @@ parameters:
     values:  [64, 256]
   drop_out: 
     values:  [0, 0.5]
-  num_layer: 
+  num_layers: 
+    values:  [1, 2, 3, 4, 5]
+  num_mlp_layers: 
     values:  [1, 2, 3, 4, 5]
   pooling: 
     values:  ["sum", "mean"]
@@ -33,3 +35,5 @@ parameters:
     values: ["Counts/OGBG-MOLLIPO_random_ktree_max_50_il1(1).homson"]
   dataset:
     values: ["ogbg-mollipo"]
+  lr_schedule_patience:
+    values: [101]

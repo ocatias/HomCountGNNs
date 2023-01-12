@@ -75,6 +75,8 @@ def parse_args(passed_args=None):
                         help='dimensionality of hidden units in models (default: 64)')
     parser.add_argument('--num_layers', type=int, default=5,
                         help='number of message passing layers (default: 5)')
+    parser.add_argument('--num_mlp_layers', type=int, default=1,
+                        help='number of final mlp layers (default: 5)')
     parser.add_argument('--virtual_node', type=int, default=0,
                         help='virtual_node')
 

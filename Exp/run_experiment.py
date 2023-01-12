@@ -17,7 +17,7 @@ import numpy as np
 from Exp.run_model import run 
 from Misc.config import RESULTS_PATH
 
-keys_to_avg = ["runtime_hours", "epochs", "parameters"] 
+keys_to_avg = ["runtime_hours", "parameters", "val", "test", "val0", "test0", "graph_feat"] 
 
 def get_directory(args):
     return os.path.join(RESULTS_PATH, f"{args.dataset}_{os.path.split(args.grid_file)[-1]}") 
@@ -62,8 +62,6 @@ def main():
                     help="Number of parameter combinations to try per fold.")
     parser.add_argument('--repeats', type=int, default=10,
                     help="Number of times to repeat the final model training")
-    parser.add_argument('--mode', type=str, default="single",
-                    help='single = average(best validation epochs), multi = best (average validation epoch)')
     parser.add_argument('--folds', type=int, default="1",
                     help='Number of folds, setting this to something other than 1, means we will treat this as cross validation')
 
@@ -242,47 +240,6 @@ def main():
         output[f"{key}-avg"] = avg
         output[f"{key}-std"] = std
         print(f"{key}:\t{avg:.4f}±{std:4f}")
-        
-    # Compute final scores
-    if args.mode == "single":
-        val, test = [], []
-        for result_test, result_val in zip(final_results["result_test"], final_results["result_val"]):
-            if mode == "min":
-                best_val_epoch = np.argmin(result_val)
-            else:
-                best_val_epoch = np.argmax(result_val)
-                
-            val.append(result_val[best_val_epoch])
-            test.append(result_test[best_val_epoch])
-        
-        output[f"result_val-avg"] = np.average(val)
-        output[f"result_val-std"] = np.std(val)
-        output[f"result_test-avg"] = np.average(test)
-        output[f"result_test-std"] = np.std(test)
-    else:
-        avg_val, std_val, avg_test, std_test = [], [], [], []
-        for i in range(min([len(result_test) for result_test in final_results["result_test"]])):
-            val, test = [], []
-            for j in range(len(final_results["result_val"])):
-                val.append(final_results["result_val"][j][i])
-                test.append(final_results["result_test"][j][i])
-
-            avg_val.append(np.average(val))
-            std_val.append(np.std(val))
-            avg_test.append(np.average(test))
-            std_test.append(np.std(test))
-            
-        if mode == "min":
-            best_val_epoch = np.argmin(avg_val)
-        else:
-            best_val_epoch = np.argmax(avg_val)
-
-        output[f"result_val-avg"] = avg_val[best_val_epoch]
-        output[f"result_val-std"] = std_val[best_val_epoch]
-        output[f"result_test-avg"] = avg_test[best_val_epoch]
-        output[f"result_test-std"] = std_test[best_val_epoch]
-
-    output["params"] = best_params
 
     output_path = os.path.join(directory, "final.json")  
     with open(output_path, "w") as file:

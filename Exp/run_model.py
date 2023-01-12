@@ -57,6 +57,7 @@ def main(args):
     
 
     finetune = False
+    time_start = time.time()
     for graph_feat in range(0, args.nr_graph_feat, 5):
         optimizer, scheduler = get_optimizer_scheduler(model, args, finetune = finetune)
         loss_dict = get_loss(args)
@@ -76,7 +77,6 @@ def main(args):
         if nr_parameters > args.max_params:
             raise ValueError("Number of model parameters is larger than the allowed maximum")
 
-        time_start = time.time()
         train_results, val_results, test_results = [], [], []
         best_val = float('inf') if mode == "min" else float('-inf')
         for epoch in range(1, args.epochs + 1):
@@ -156,13 +156,12 @@ def main(args):
             "graph_features": graph_feat,
             "best_epoch": int(best_val_epoch + 1),
             "epochs": int(epoch),
-            "final_val_results": result_val,
+            "final_val_result": result_val,
             "final_test_result": result_test,
             "final_train_loss": loss_train,
             "final_val_loss": loss_val,
             "final_test_loss": loss_test,
             "parameters": nr_parameters,
-            "mode": mode,
             "loss_train": train_results['total_loss'], 
             "loss_val": val_results['total_loss'],
             "loss_test": test_result['total_loss'],
@@ -185,9 +184,9 @@ def main(args):
 
     print("\nGraph features\tVal Result\tTest Result")
     for result in results:
-        print(f"{result['graph_features']}: {result['final_val_results']}\t{result['final_test_result']}")
+        print(f"{result['graph_features']}: {result['final_val_result']}\t{result['final_test_result']}")
 
-    val_metrics = list(map(lambda r: r["final_val_results"], results))
+    val_metrics = list(map(lambda r: r["final_val_result"], results))
     test_metrics = list(map(lambda r: r["final_test_result"], results))
     graph_features = list(map(lambda r: r["graph_features"], results))
 
@@ -207,7 +206,16 @@ def main(args):
         wandb.finish()
         print("Done.")
 
-    return {"results": results, "val": best_val_metric, "test": best_test_metric, "graph_feat": best_graph_feat}        
+    return {"val": best_val_metric, 
+        "test": best_test_metric,
+        "graph_feat": best_graph_feat, 
+        "runtime_hours":  (time.time()-time_start)/3600, 
+        "parameters": nr_parameters,  
+        "mode": mode, 
+        "val0": results[0]["final_val_result"],
+        "test0": results[0]["final_test_result"],
+        "results": results,}
+                
 
 def run(passed_args = None):
     args = parse_args(passed_args)
