@@ -26,8 +26,11 @@ def main(args):
     train_loader, val_loader, test_loader = load_dataset(args, config)
     num_classes, num_vertex_features = train_loader.dataset.num_classes, train_loader.dataset.num_node_features
     print(f"Number of features: {num_vertex_features}")
-    
-    graph_features = train_loader.dataset[0].graph_features.shape[1]
+
+    if "graph_features" in train_loader.dataset[0]:
+        graph_features = train_loader.dataset[0].graph_features.shape[1]
+    else:
+        graph_features = 0
 
     if args.dataset.lower() == "zinc" or "ogb" in args.dataset.lower():
         num_classes = 1
@@ -141,7 +144,7 @@ def main(args):
                     print("\nLR REACHED MINIMUM: Stopping")
                     break
                 
-            finetune = True
+        finetune = True
 
         # Final result
         train_results = list_of_dictionary_to_dictionary_of_lists(train_results)

@@ -16,6 +16,9 @@ from Models.gnn import GNN
 from Models.encoder import NodeEncoder, EdgeEncoder, ZincAtomEncoder, EgoEncoder
 from Models.mlp import MLP
 from Misc.attach_graph_features import AttachGraphFeat
+from Misc.drop_features import DropFeatures
+from Misc.add_zero_edge_attr import AddZeroEdgeAttr
+from Misc.pad_node_attr import PadNodeAttr
 
 def get_transform(args):
     transforms = []
@@ -29,6 +32,9 @@ def get_transform(args):
 
     if args.graph_feat != "":
         transforms.append(AttachGraphFeat(args.graph_feat))
+        
+    if args.do_drop_feat:
+        transforms.append(DropFeatures(args.emb_dim))
 
     return Compose(transforms)
 
@@ -86,7 +92,7 @@ def get_model(args, num_classes, num_vertex_features, num_tasks):
         node_feature_dims.append(21)
         node_encoder = NodeEncoder(emb_dim=args.emb_dim, feature_dims=node_feature_dims)
         edge_encoder =  EdgeEncoder(emb_dim=args.emb_dim, feature_dims=[4])
-    elif args.dataset.lower() in ["ogbg-molhiv", "ogbg-molpcba", "ogbg-moltox21", "ogbg-molesol", "ogbg-molbace", "ogbg-molbbbp", "ogbg-molclintox", "ogbg-molmuv", "ogbg-molsider", "ogbg-moltoxcast", "ogbg-molfreesolv", "ogbg-mollipo"]:
+    elif args.dataset.lower() in ["ogbg-molhiv", "ogbg-molpcba", "ogbg-moltox21", "ogbg-molesol", "ogbg-molbace", "ogbg-molbbbp", "ogbg-molclintox", "ogbg-molmuv", "ogbg-molsider", "ogbg-moltoxcast", "ogbg-molfreesolv", "ogbg-mollipo"] and not args.do_drop_feat:
 
         node_feature_dims += get_atom_feature_dims()
         print("node_feature_dims: ", node_feature_dims)
