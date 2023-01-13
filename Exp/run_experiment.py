@@ -64,6 +64,8 @@ def main():
                     help="Number of times to repeat the final model training")
     parser.add_argument('--folds', type=int, default="1",
                     help='Number of folds, setting this to something other than 1, means we will treat this as cross validation')
+    parser.add_argument('--graph_feat', type=str, default="",
+                        help="Path to a file that contains the graph features.")
 
     args = parser.parse_args()
 
@@ -129,6 +131,9 @@ def main():
             param_dict = {
                 "--dataset": args.dataset
                         }
+            if args.graph_feat != "":
+                param_dict["--graph_feat"] = args.graph_feat
+            
             for key, value in param[0].items():
                 param_dict["--" + str(key)] = str(value)
                 

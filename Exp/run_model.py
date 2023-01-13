@@ -27,6 +27,7 @@ def main(args):
     num_classes, num_vertex_features = train_loader.dataset.num_classes, train_loader.dataset.num_node_features
     print(f"Number of features: {num_vertex_features}")
     
+    graph_features = train_loader.dataset[0].graph_features.shape[1]
 
     if args.dataset.lower() == "zinc" or "ogb" in args.dataset.lower():
         num_classes = 1
@@ -58,7 +59,25 @@ def main(args):
 
     finetune = False
     time_start = time.time()
-    for graph_feat in range(0, args.nr_graph_feat + 1, 5):
+    
+    if graph_features < 4:
+        nr_features = list(range(graph_features + 1))
+    else:
+        nr_features = [0, graph_features//4, graph_features//2, 3*graph_features//4, graph_features] 
+    
+    for graph_feat in nr_features:
+        
+        if finetune:
+            # Load model
+            model.set_mlp(0)
+            model.load_state_dict(torch.load(model_path))
+
+            if args.do_freeze_gnn:
+                model.freeze_gnn(True)
+
+            model.set_mlp(graph_feat, copy_emb_weights = True)
+            print(f"\n\n\nRetraining. Frozen: {args.do_freeze_gnn}, Graph features: {graph_feat}")
+        
         optimizer, scheduler = get_optimizer_scheduler(model, args, finetune = finetune)
         loss_dict = get_loss(args)
 
@@ -90,10 +109,10 @@ def main(args):
             test_results.append(test_result)
 
             if (mode == "min" and val_result[eval_name] < best_val) or (mode == "max" and val_result[eval_name] > best_val):
-                print("Storing", model_path)
                 best_val = val_result[eval_name]
 
                 if not finetune:
+                    print("Storing", model_path)
                     torch.save(model.state_dict(), model_path)
 
             # print(f"\tTRAIN \tLoss: {train_result['total_loss']:10.4f}\t{eval_name}: {train_result[eval_name]:10.4f}")
@@ -121,6 +140,8 @@ def main(args):
             if optimizer.param_groups[0]['lr'] < args.min_lr:
                     print("\nLR REACHED MINIMUM: Stopping")
                     break
+                
+            finetune = True
 
         # Final result
         train_results = list_of_dictionary_to_dictionary_of_lists(train_results)
@@ -170,17 +191,6 @@ def main(args):
             "result_test": test_result[eval_name],
             "runtime_hours":  runtime,
         })
-
-        # Load model
-        model.set_mlp(0)
-        model.load_state_dict(torch.load(model_path))
-
-        if args.do_freeze_gnn:
-            model.freeze_gnn(True)
-
-        model.set_mlp(graph_feat + 1, copy_emb_weights = True)
-        print(f"\n\n\nRetraining. Frozen: {args.do_freeze_gnn}, Graph features: {graph_feat + 1}")
-        finetune = True
 
     print("\nGraph features\tVal Result\tTest Result")
     for result in results:

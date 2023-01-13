@@ -91,8 +91,8 @@ def parse_args(passed_args=None):
                         help="Path to a file that contains the graph features.")
     parser.add_argument('--freeze_gnn', type=int, default=0,
                         help="Freeze GNN layers after training it.")
-    parser.add_argument('--nr_graph_feat', type=int, default=0,
-                        help='Number of graph features to use')
+    # parser.add_argument('--nr_graph_feat', type=int, default=0,
+    #                     help='Number of graph features to use')
     
     parser.add_argument('--drop_feat', type=int, default=0,
                         help="Drop all features from the graph")
