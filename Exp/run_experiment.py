@@ -124,7 +124,7 @@ def main():
                     
                     if same_param:
                         already_checked_params = True
-                        print(f"Already tried {param} and got validation score of {curr_param_to_check['final_val_results']}")
+                        print(f"Already tried {param} and got validation score of {curr_param_to_check['val']}")
                         break
 
             prev_params.append(param)
