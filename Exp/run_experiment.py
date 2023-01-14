@@ -204,7 +204,7 @@ def main():
         prev_evaluation = glob.glob(os.path.join(final_eval_path, "*.json"))
         nr_tries = args.repeats - len(prev_evaluation)
         for iteration in range(nr_tries):
-            print(f"Evaluation: {iteration + len(prev_evaluation) + 1} / {nr_tries})
+            print(f"Evaluation: {iteration + len(prev_evaluation) + 1} / {nr_tries}")
             best_params["--seed"] = iteration
             result_dict = run(best_params)
 
