@@ -18,4 +18,4 @@ class DropFeatures(BaseTransform):
         return data
     
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}()'
+        return f'{self.__class__.__name__}({self.emb_dim})'
