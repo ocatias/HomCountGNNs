@@ -145,7 +145,8 @@ class GNN_node(torch.nn.Module):
         ### computing input node embedding
 
         # Only works for integer features!!!
-        x = x.long()
+        if self.gnn_type == "gin":
+            x = x.long()
         edge_attr = edge_attr.long()
 
         h_list = [self.node_encoder(x)]     
