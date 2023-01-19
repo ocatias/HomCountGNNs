@@ -219,6 +219,9 @@ def main(args):
         wandb.finish()
         print("Done.")
 
+    # Delete model
+    os.remove(model_path)
+
     return {"val": best_val_metric, 
         "test": best_test_metric,
         "graph_feat": best_graph_feat, 
