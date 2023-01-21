@@ -10,4 +10,6 @@ do
     python Exp/run_experiment.py -grid "Configs/Eval/gin_with_features.yaml" -dataset "${dataset[i]}" --candidates 50  --repeats 10
     done
 
-
+# ZINC
+python Exp/run_experiment.py -grid "Configs/Eval_ZINC/gin_with_features.yaml" -dataset "ZINC" --candidates 50  --repeats 10 --graph_feat "Counts/Current/ZINC_SUBSET_full_kernel_max_50_20230117.overflow_filtered"
+python Exp/run_experiment.py -grid "Configs/Eval_ZINC/gin_with_features.yaml" -dataset "ZINC" --candidates 50  --repeats 10

@@ -31,6 +31,8 @@ class AttachGraphFeat(BaseTransform):
 
     def __call__(self, data: Data):
         assert  self.graph_features[self.idx]['vertices'] == data.x.shape[0]
+
+        print(data, self.graph_features[self.idx])
         assert  self.graph_features[self.idx]['edges'] == data.edge_index.shape[1]
 
         # Standardize data via standard score (https://en.wikipedia.org/wiki/Standard_score)
