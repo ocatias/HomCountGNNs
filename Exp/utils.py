@@ -20,7 +20,7 @@ from Misc.drop_features import DropFeatures
 from Misc.add_zero_edge_attr import AddZeroEdgeAttr
 from Misc.pad_node_attr import PadNodeAttr
 
-def get_transform(args):
+def get_transform(args, split = None):
     transforms = []
     if args.dataset.lower() == "csl":
         transforms.append(OneHotDegree(5))
@@ -31,7 +31,8 @@ def get_transform(args):
         transforms.append(PadNodeAttr(args.emb_dim))
 
     if args.graph_feat != "":
-        transforms.append(AttachGraphFeat(args.graph_feat))
+        use_zinc = args.dataset.lower() == "zinc"
+        transforms.append(AttachGraphFeat(args.graph_feat, process_splits_separately = use_zinc, half_nr_edges = use_zinc))
         
     if args.do_drop_feat:
         transforms.append(DropFeatures(args.emb_dim))
