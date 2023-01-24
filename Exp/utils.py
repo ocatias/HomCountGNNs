@@ -89,7 +89,7 @@ def get_model(args, num_classes, num_vertex_features, num_tasks):
     
     model = args.model.lower()
 
-    if args.dataset.lower() == "zinc":
+    if args.dataset.lower() == "zinc"and not args.do_drop_feat:
         node_feature_dims.append(21)
         node_encoder = NodeEncoder(emb_dim=args.emb_dim, feature_dims=node_feature_dims)
         edge_encoder =  EdgeEncoder(emb_dim=args.emb_dim, feature_dims=[4])
