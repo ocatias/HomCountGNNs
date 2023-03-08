@@ -58,7 +58,7 @@ regression_ogb_datasets = ["molesol", "molfreesolv", "mollipo"]
 regression_datsets = regression_ogb_datasets + ["zinc"]
 ogb_datasets = binary_class_ogb_datasets + regression_ogb_datasets
     
-def main():
+def main(passed_args = None):
     parser = argparse.ArgumentParser(description='An experiment.')
     parser.add_argument('-grid', dest='grid_file', type=str,
                     help="Path to a .yaml file that contains the parameters grid.")
@@ -74,8 +74,13 @@ def main():
     parser.add_argument('--params_exp_name', dest='params_exp', type=str,
                     help="Set to the name of an experiment whose hyperparameter search you want to use (ignores their graph feat file)", default = "")
 
-
-    args = parser.parse_args()
+    if passed_args is None:
+        args = parser.parse_args()
+    else:
+        list_args = []
+        for key,value in passed_args.items():
+            list_args += [key, str(value)]
+        args = parser.parse_args(list_args)
 
     if args.params_exp != "":
         args.candidates = 0
