@@ -29,7 +29,12 @@ def get_paths(args, split):
         results_path = os.path.join(directory, f"split_{split}") 
     else:
         results_path = directory
-    hyperparams_path = os.path.join(results_path, "Hyperparameters")
+
+    if args.params_exp == "":
+        hyperparams_path = os.path.join(results_path, "Hyperparameters")
+    else:
+        hyperparams_path = os.path.join(RESULTS_PATH, args.params_exp, "Hyperparameters") 
+
     final_eval_path = os.path.join(results_path, "FinalResults")
     errors_path = os.path.join(results_path, "Errors")
     return directory, results_path, hyperparams_path, final_eval_path, errors_path
@@ -66,8 +71,14 @@ def main():
                     help='Number of folds, setting this to something other than 1, means we will treat this as cross validation')
     parser.add_argument('--graph_feat', type=str, default="",
                         help="Path to a file that contains the graph features.")
+    parser.add_argument('--params_exp_name', dest='params_exp', type=str,
+                    help="Set to the name of an experiment whose hyperparameter search you want to use (ignores their graph feat file)", default = "")
+
 
     args = parser.parse_args()
+
+    if args.params_exp != "":
+        args.candidates = 0
 
     with open(args.grid_file, 'r') as file:
         grid_raw = yaml.safe_load(file)
@@ -82,7 +93,10 @@ def main():
             
             if not os.path.isdir(results_path):
                 os.mkdir(results_path)
-            os.mkdir(hyperparams_path)
+
+            if args.params_exp == "":
+                os.mkdir(hyperparams_path)
+
             os.mkdir(final_eval_path)
             os.mkdir(errors_path)
 
@@ -197,6 +211,9 @@ def main():
                             best_result_val = dict["val"]
                         else:
                             best_result_val = dict["val"]
+
+                    if args.params_exp != "":
+                        best_params["--graph_feat"] = args.graph_feat
 
             print(f"Best params have score {best_result_val:.4f} and are:\n{best_params}")
 
