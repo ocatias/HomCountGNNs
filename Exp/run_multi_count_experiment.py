@@ -33,7 +33,7 @@ def main():
     old_count_filename = os.path.split(old_count)[-1]
 
     for new_count in relevant_new_counts:
-        args = {
+        exp_args = {
             "-grid": args.grid_file,
             "-dataset": args.dataset,
             "--repeats": args.repeats,
@@ -41,7 +41,7 @@ def main():
             "--graph_feat": new_count,
             "--params_exp_name":  f"{args.dataset}_{os.path.split(args.grid_file)[-1]}" + f"_{old_count_filename}" 
         }
-        run_exp(args)
+        run_exp(exp_args)
 
 
 if __name__ == "__main__":
