@@ -96,7 +96,8 @@ def parse_args(passed_args=None):
     
     parser.add_argument('--drop_feat', type=int, default=0,
                         help="Drop all features from the graph")
-                    
+    parser.add_argument('--misalign', type=int, default=0,
+                        help="Attaches graph features in the wrong way if set to 1, also disables the 0 count features as a possible result (Default: 0)")
 
     # Load partial args instead of command line args (if they are given)
     if passed_args is not None:
@@ -115,6 +116,7 @@ def parse_args(passed_args=None):
     args.__dict__["use_node_encoder"] = args.node_encoder == 1
     args.__dict__["do_freeze_gnn"] = args.freeze_gnn == 1
     args.__dict__["do_drop_feat"] = args.drop_feat == 1
+    args.__dict__["use_misaligned"] = args.misalign == 1
 
     # https://codereview.stackexchange.com/a/79015
     # If a config file is provided, write it's values into the arguments

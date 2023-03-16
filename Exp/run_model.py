@@ -202,8 +202,14 @@ def main(args):
     val_metrics = list(map(lambda r: r["final_val_result"], results))
     test_metrics = list(map(lambda r: r["final_test_result"], results))
     graph_features = list(map(lambda r: r["graph_features"], results))
-
-    best_val_idx = np.argmin(val_metrics) if mode == "min" else np.argmax(val_metrics)
+    
+    # Do not use the 0 graph_feat count feature if use_misaligned is true
+    
+    if args.use_misaligned:
+        best_val_idx = 1 + (np.argmin(val_metrics[1:]) if mode == "min" else np.argmax(val_metrics[1:]))
+    else:
+        best_val_idx = np.argmin(val_metrics) if mode == "min" else np.argmax(val_metrics)
+    
     best_val_metric = val_metrics[best_val_idx]
     best_test_metric = test_metrics[best_val_idx]
     best_graph_feat = graph_features[best_val_idx]

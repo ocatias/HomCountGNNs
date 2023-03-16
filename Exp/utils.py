@@ -32,7 +32,7 @@ def get_transform(args, split = None):
 
     if args.graph_feat != "":
         use_zinc = args.dataset.lower() == "zinc"
-        transforms.append(AttachGraphFeat(args.graph_feat, process_splits_separately = use_zinc, half_nr_edges = use_zinc))
+        transforms.append(AttachGraphFeat(args.graph_feat, process_splits_separately = use_zinc, half_nr_edges = use_zinc, misaligned = args.use_misaligned))
         
     if args.do_drop_feat:
         transforms.append(DropFeatures(args.emb_dim))
