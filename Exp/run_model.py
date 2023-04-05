@@ -62,12 +62,12 @@ def main(args):
 
     finetune = False
     time_start = time.time()
-    
-    if graph_features < 4:
-        nr_features = list(range(graph_features + 1))
+
+    if graph_features > 0:
+        nr_features = [0, graph_features] 
     else:
-        nr_features = [0, graph_features//4, graph_features//2, 3*graph_features//4, graph_features] 
-    
+        nr_features = [0]
+
     for graph_feat in nr_features:
         
         if finetune:
@@ -203,9 +203,8 @@ def main(args):
     test_metrics = list(map(lambda r: r["final_test_result"], results))
     graph_features = list(map(lambda r: r["graph_features"], results))
     
-    # Do not use the 0 graph_feat count feature if use_misaligned is true
-    
-    if args.use_misaligned:
+    # Do not use the 0 graph_feat count
+    if args.graph_feat != "":
         best_val_idx = 1 + (np.argmin(val_metrics[1:]) if mode == "min" else np.argmax(val_metrics[1:]))
     else:
         best_val_idx = np.argmin(val_metrics) if mode == "min" else np.argmax(val_metrics)
