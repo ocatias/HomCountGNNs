@@ -67,8 +67,10 @@ class GNN(torch.nn.Module):
             h_graph = torch.cat([h_graph,  batched_data.graph_features[:, 0:self.graph_features]], dim=1)
 
         h_graph = h_graph
-        for layer in self.mlp:
+        for i, layer in enumerate(self.mlp):
             h_graph = layer(h_graph)
+            if i < self.num_mlp_layers - 1:
+                h_graph = F.dropout(h_graph, self.drop_ratio, training = self.training)
 
         if self.num_tasks == 1:
             h_graph = h_graph.view(-1, self.num_classes)
