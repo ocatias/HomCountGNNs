@@ -57,6 +57,20 @@ class AttachGraphFeat(BaseTransform):
 
         # Standardize data via standard score (https://en.wikipedia.org/wiki/Standard_score)
         graph_features = (torch.tensor(self.graph_features[self.idx]['counts']) - self.mean) / self.std
+        
+        
+        # Standardize by dividing by the maximal number that each pattern can appear in the graph
+        
+        # graph_features = torch.tensor(self.graph_features[self.idx]['counts'])
+        # print(graph_features)
+        # nr_vertices_vec = torch.ones_like(graph_features)*data.x.shape[0]
+        # max_nr_counts = torch.pow(nr_vertices_vec, graph_features)
+        # graph_features = graph_features / max_nr_counts
+        
+        # print(graph_features)
+        # print("\n")
+        # assert torch.all(torch.le(graph_features, 1)) and torch.all(torch.ge(graph_features, 0))
+        
         graph_features = torch.unsqueeze(graph_features, 0)
         data.graph_features = graph_features
         self.idx += 1
