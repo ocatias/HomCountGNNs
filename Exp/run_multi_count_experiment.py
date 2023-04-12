@@ -25,12 +25,14 @@ def main():
     args = parser.parse_args()
 
     # Collect all relevant Counts
-    relevant_new_counts = glob.glob(os.path.join(".", "Counts", "RepeatedCounts", f"{args.dataset.upper()}_*.overflow_filtered"))
+    relevant_new_counts = glob.glob(os.path.join(".", "Counts", "RepeatedCounts", f"{args.dataset.upper()}_*.singleton_filtered"))
     relevant_new_counts = list(filter(lambda x: int(x.split("run")[1].split(".")[0]) <= args.nr_diff_counts, relevant_new_counts))
     assert len(relevant_new_counts) == args.nr_diff_counts
 
-    old_count = glob.glob(os.path.join(".", "Counts", "Current", f"{args.dataset.upper()}_*"))[0]
+    old_count = glob.glob(os.path.join(".", "Counts", "RepeatedCounts", f"{args.dataset.upper()}_*run1.singleton_filtered"))[0]
     old_count_filename = os.path.split(old_count)[-1]
+
+    print("->", f"{args.dataset}_{os.path.split(args.grid_file)[-1]}" + f"_{old_count_filename}")
 
     for new_count in relevant_new_counts:
         exp_args = {
