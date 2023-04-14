@@ -20,8 +20,14 @@ class AttachGraphFeat(BaseTransform):
 
         # Compute mean and standard deviation of training data for standardization
         training_counts = torch.stack(list(map(lambda f: torch.tensor(f['counts']) ,(filter(lambda f: f['split'] == 'train', graph_features)))))
-        self.mean  = torch.mean(training_counts)
-        self.std = torch.std(training_counts)
+        self.mean  = torch.mean(training_counts, dim=0, keepdim=False)
+        self.std = torch.std(training_counts, dim=0, keepdim=False)
+        
+        print(f"training_counts: {training_counts.shape}, mean: {self.mean.shape}, std: {self.std.shape}")
+        
+        # Mask to mask out constant values
+        self.mask = self.std != 0
+     
         self.misaligned = misaligned
 
         if process_splits_separately:
@@ -58,7 +64,9 @@ class AttachGraphFeat(BaseTransform):
         # Standardize data via standard score (https://en.wikipedia.org/wiki/Standard_score)
         graph_features = (torch.tensor(self.graph_features[self.idx]['counts']) - self.mean) / self.std
         
-        
+        # Mask out values that were constant (they would be NaN after dividing by std)
+        graph_features = graph_features[self.mask]
+
         # Standardize by dividing by the maximal number that each pattern can appear in the graph
         
         # graph_features = torch.tensor(self.graph_features[self.idx]['counts'])

@@ -64,7 +64,7 @@ def main(args):
     time_start = time.time()
 
     if graph_features > 0:
-        nr_features = [0, 4  ] 
+        nr_features = [0, graph_features] 
     else:
         nr_features = [0]
 
