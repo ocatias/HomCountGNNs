@@ -1,16 +1,45 @@
 # HomCountGNNs
 
-1. Create and activate conda environment
-2. Add this directory to the python path
-3. Install PyTorch (Geometric)
+## Setup
 
+1. Clone repository
+```
+git clone https://github.com/ocatias/HomCountGNNs/
+cd HomCountGNNs
+```
+
+2. Create and activate conda environment (this assume miniconda is installed)
+```
+conda create --name HOM
+conda activate HOM
+```
+
+3. Add this directory to the python path. Let `$PATH` be the path to where this repository is stored (i.e. the result of running `pwd`).
+```
+export PYTHONPATH=$PYTHONPATH:$PATH
+```
+
+4. Install PyTorch (Geometric)
+```
 conda install pytorch==1.12.0 torchvision==0.13.0 torchaudio==0.12.0 -c pytorch
+conda install -c pyg pyg=2.2.0
+```
 
-conda install pyg -c pyg
-
-4. Install remaning dependencies
-
+5. Install remaining dependencies
+```
 pip install -r requirements.txt
+```
 
+## Recreating experiments
+Run experimentes with the following scripts. Results will be in the Results directory.
 
-Run experimentes with the scripts provided in the Scripts directory. Results will be in the Results directory.
+**Main experiments.** Homomorphism counts against no homomorphism counts:
+```
+bash Scripts/large_datasets.sh
+bash Scripts/small_datasets.sh
+```
+
+**Ablation.** Impact of misaligned homomorphism counts:
+```
+bash Scripts/misaligned_feats.sh
+```
