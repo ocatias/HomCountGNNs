@@ -1,4 +1,5 @@
 # HomCountGNNs
+This repository contains the code of the GNN part of the paper **[Expectation-Complete Graph Representations with Homomorphisms]()** (ICML, 2023).
 
 ## Setup
 
